@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter_crud_api/models/note.dart';
 import 'package:flutter_crud_api/models/note_for_listing.dart';
 import 'package:flutter_crud_api/models/api_response.dart';
-import 'package:flutter_crud_api/models/note_insert.dart';
+import 'package:flutter_crud_api/models/note_manipulation.dart';
 import 'package:http/http.dart' as http;
 
 class NoteServices {
@@ -17,7 +17,6 @@ class NoteServices {
     return http.get(url + '/notes', headers: headers).then((data) {
       print(data.statusCode);
       if (data.statusCode == 200) {
-        print("burada 0");
         final jsonData = json.decode(data.body);
         final notes = <NoteForListing>[];
         for (var item in jsonData) {
@@ -42,7 +41,7 @@ class NoteServices {
         APIResponse<Note>(error: true, errorMessage: "Bir hata olustu q"));
   }
 
-  Future<APIResponse<bool>> createNote(NoteInsert item) {
+  Future<APIResponse<bool>> createNote(NoteManipulation item) {
     return http
         .post(url + '/notes', headers: headers, body: jsonEncode(item.toJson()))
         .then((data) {
@@ -51,6 +50,30 @@ class NoteServices {
       }
       return APIResponse<bool>(error: true, errorMessage: "Bir hata olustu");
     }).catchError((_) =>
-            APIResponse<bool>(error: true, errorMessage: "Bir hata olustu q"));
+            APIResponse<bool>(error: true, errorMessage: "Bir hata olustu "));
+  }
+
+  Future<APIResponse<bool>> updateNote(String noteID,NoteManipulation item) {
+    return http
+        .put(url + '/notes/'+noteID, headers: headers, body: jsonEncode(item.toJson()))
+        .then((data) {
+      if (data.statusCode == 204) {
+        return APIResponse<bool>(data: true);
+      }
+      return APIResponse<bool>(error: true, errorMessage: "Bir hata olustu");
+    }).catchError((_) =>
+            APIResponse<bool>(error: true, errorMessage: "Bir hata olustu "));
+  }
+
+  Future<APIResponse<bool>> deleteNote(String noteID) {
+    return http
+        .delete(url + '/notes/'+noteID, headers: headers,)
+        .then((data) {
+      if (data.statusCode == 204) {
+        return APIResponse<bool>(data: true);
+      }
+      return APIResponse<bool>(error: true, errorMessage: "Bir hata olustu");
+    }).catchError((_) =>
+            APIResponse<bool>(error: true, errorMessage: "Bir hata olustu "));
   }
 }

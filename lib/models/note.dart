@@ -7,6 +7,7 @@ class Note {
 
   Note({this.noteID,this.noteTitle,this.noteContent,this.createDateTime,this.latestEditDateTime});
 
+  //
   factory Note.fromJson(Map<String ,dynamic > item){
     return  Note(
       noteID: item['noteID'],

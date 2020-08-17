@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_crud_api/models/note.dart';
-import 'package:flutter_crud_api/models/note_insert.dart';
+import 'package:flutter_crud_api/models/note_manipulation.dart';
 import 'package:flutter_crud_api/services/note_services.dart';
 import 'package:get_it/get_it.dart';
 
@@ -79,13 +79,49 @@ class _NoteModifyState extends State<NoteModify> {
                       child: RaisedButton(
                         onPressed: () async {
                           if (isEditing) {
-                            //Update
+                            setState(() {
+                              _isLoading = true;
+                            });
+
+                            final note = NoteManipulation(
+                              noteTitle: _titleController.text,
+                              noteContent: _contentController.text,
+                            );
+                            final result = await noteServices.updateNote(widget.noteID,note);
+
+                            setState(() {
+                              _isLoading = false;
+                            });
+                            final title = "Bitti";
+                            final text = result.error
+                                ? (result.errorMessage ??
+                                    "Bir hata ile karsilandi")
+                                : "Not guncellendi";
+
+                            showDialog(
+                                context: context,
+                                builder: (_) => AlertDialog(
+                                      title: Text(title),
+                                      content: Text(text),
+                                      actions: <Widget>[
+                                        FlatButton(
+                                          child: Text("Tamam"),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                        )
+                                      ],
+                                    )).then((data) {
+                              if (result.data) {
+                                Navigator.of(context).pop();
+                              }
+                            });
                           } else {
                             setState(() {
                               _isLoading = true;
                             });
 
-                            final note = NoteInsert(
+                            final note = NoteManipulation(
                               noteTitle: _titleController.text,
                               noteContent: _contentController.text,
                             );
